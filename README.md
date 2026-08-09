@@ -2,7 +2,11 @@
 
 An interactive dashboard that tracks demand for AI, data, and analytics skills across job postings — highlighting the most in-demand tools, the AI/ML vs. data-analytics split, hiring trends by experience level, and top locations.
 
+## 📊 Power BI Dashboard
 
+<p align="center">
+  <img src="./dashboard.jpg" alt="AI Skill Demand Tracker Dashboard" width="100%">
+</p>
 
 ## 🔍 Overview
 
