@@ -1,0 +1,132 @@
+/* =====================================================================
+   AI Skill Demand Tracker — DAX measures
+   ---------------------------------------------------------------------
+   How to use:
+   1. Open Power BI Desktop
+   2. Get Data > Text/CSV > import cleaned_jobs.csv AND job_skills.csv
+   3. In the Fields pane, right-click "job_skills" > New measure
+   4. Paste each measure below (name + formula), one at a time
+   5. Build visuals per README.md, using these measures as the Values
+
+   All measures assume the table is named "job_skills" as loaded from
+   job_skills.csv (columns: job_id, job_title, company, location,
+   experience_level, date_posted, skill).
+   ===================================================================== */
+
+-- ---------------------------------------------------------------------
+-- KPI CARD MEASURES
+-- ---------------------------------------------------------------------
+
+Total Jobs = DISTINCTCOUNT(job_skills[job_id])
+
+Total Skills = DISTINCTCOUNT(job_skills[skill])
+
+Total Skill Mentions = COUNTROWS(job_skills)
+
+-- "Job Count" is the core measure used by almost every chart —
+-- always count DISTINCT job_id, never COUNTROWS, or multi-skill jobs
+-- get double-counted per skill.
+Job Count = DISTINCTCOUNT(job_skills[job_id])
+
+Top Skill =
+CALCULATE(
+    SELECTEDVALUE(job_skills[skill]),
+    TOPN(1, VALUES(job_skills[skill]), [Job Count], DESC)
+)
+
+Top Skill Job Count =
+CALCULATE([Job Count], TOPN(1, VALUES(job_skills[skill]), [Job Count], DESC))
+
+-- "Top AI skill" restricts the same ranking logic to the AI/ML bucket.
+-- Edit the skill list here if you redefine which skills count as AI.
+Top AI Skill =
+CALCULATE(
+    SELECTEDVALUE(job_skills[skill]),
+    TOPN(
+        1,
+        FILTER(
+            VALUES(job_skills[skill]),
+            job_skills[skill] IN
+                { "Machine Learning", "Deep Learning", "NLP", "Generative AI" }
+        ),
+        [Job Count], DESC
+    )
+)
+
+-- ---------------------------------------------------------------------
+-- AI vs DATA & ANALYTICS GROUPING (for the donut chart)
+-- ---------------------------------------------------------------------
+-- Recommended: add a calculated column instead of a measure, so the
+-- donut chart can group by category directly.
+--
+-- In job_skills table > New column:
+--
+-- Skill Category =
+-- IF(
+--     job_skills[skill] IN
+--         { "Machine Learning", "Deep Learning", "NLP", "Generative AI" },
+--     "AI / ML Skills",
+--     "Data & Analytics Skills"
+-- )
+--
+-- Then the donut just uses Job Count (measure above) with
+-- Skill Category as the legend field — no extra measure needed.
+
+AI Skill Job Count =
+CALCULATE(
+    [Job Count],
+    job_skills[skill] IN { "Machine Learning", "Deep Learning", "NLP", "Generative AI" }
+)
+
+Data Analytics Skill Job Count =
+CALCULATE(
+    [Job Count],
+    job_skills[skill] IN { "Python", "SQL", "Power BI", "Excel", "Tableau", "AWS" }
+)
+
+AI Skill Share % = DIVIDE([AI Skill Job Count], [Job Count])
+
+-- ---------------------------------------------------------------------
+-- SKILLS BY JOB TITLE / LOCATION / EXPERIENCE
+-- ---------------------------------------------------------------------
+-- These don't need special measures — just drag job_title, location,
+-- or experience_level onto the axis of a bar chart alongside the
+-- [Job Count] measure, and 'skill' onto the Legend field. Power BI
+-- aggregates automatically per the current filter context.
+
+-- If you want a measure that shows the single most in-demand skill
+-- FOR THE CURRENTLY FILTERED job title / location / experience level
+-- (e.g. for a tooltip or card that reacts to a slicer):
+Top Skill In Context =
+CALCULATE(
+    SELECTEDVALUE(job_skills[skill]),
+    TOPN(1, VALUES(job_skills[skill]), [Job Count], DESC)
+)
+-- (identical formula to "Top Skill" above — it automatically respects
+--  whatever slicers/filters are active on job_title, location, etc.)
+
+-- ---------------------------------------------------------------------
+-- TREND OVER TIME (bonus line chart — jobs posted per month per skill)
+-- ---------------------------------------------------------------------
+-- Add a calculated column first:
+--
+-- Post Month = FORMAT(job_skills[date_posted], "YYYY-MM")
+--
+-- Then plot Post Month on the x-axis and [Job Count] on the y-axis,
+-- with 'skill' as the legend if you want it broken out per skill.
+
+Month over Month Change =
+VAR CurrentCount = [Job Count]
+VAR PreviousCount =
+    CALCULATE(
+        [Job Count],
+        DATEADD(job_skills[date_posted], -1, MONTH)
+    )
+RETURN
+    DIVIDE(CurrentCount - PreviousCount, PreviousCount)
+
+-- ---------------------------------------------------------------------
+-- RANKING (useful for a "Rank" column in a table visual)
+-- ---------------------------------------------------------------------
+Skill Rank =
+RANKX(ALL(job_skills[skill]), [Job Count], , DESC)

@@ -1,0 +1,122 @@
+
+<h2 class="sr-only">Mockup of the AI Skill Demand Tracker Power BI dashboard in a charcoal and teal theme, showing KPI cards, top skills, AI vs data analytics split, skills by experience level, and top skills by location.</h2>
+<div style="background:#12141c; padding:20px; border-radius:12px; font-family:var(--font-sans);">
+
+  <div style="display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px; margin-bottom:16px;">
+    <div style="background:#1c2029; border-radius:10px; padding:14px 16px;">
+      <div style="font-size:12px; color:#8b95a1;">Total jobs</div>
+      <div style="font-size:24px; font-weight:500; color:#f1f5f4; margin-top:4px;">1,000</div>
+    </div>
+    <div style="background:#1c2029; border-radius:10px; padding:14px 16px;">
+      <div style="font-size:12px; color:#8b95a1;">Total skills</div>
+      <div style="font-size:24px; font-weight:500; color:#f1f5f4; margin-top:4px;">10</div>
+    </div>
+    <div style="background:#1c2029; border-radius:10px; padding:14px 16px;">
+      <div style="font-size:12px; color:#8b95a1;">Top skill</div>
+      <div style="font-size:24px; font-weight:500; color:#2dd4bf; margin-top:4px;">Python</div>
+    </div>
+    <div style="background:#1c2029; border-radius:10px; padding:14px 16px;">
+      <div style="font-size:12px; color:#8b95a1;">Top AI skill</div>
+      <div style="font-size:24px; font-weight:500; color:#2dd4bf; margin-top:4px;">Machine learning</div>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1.3fr 1fr; gap:12px; margin-bottom:12px;">
+    <div style="background:#1c2029; border-radius:10px; padding:14px 16px;">
+      <div style="font-size:13px; color:#8b95a1; margin-bottom:6px;">Top in-demand AI and data skills</div>
+      <div style="position:relative; height:280px;">
+        <canvas id="skillsChart" role="img" aria-label="Horizontal bar chart of job counts per skill: Python 597, SQL 554, Machine Learning 554, Power BI 497, Excel 401, NLP 375, AWS 345, Generative AI 334, Deep Learning 294, Tableau 281">Python 597, SQL 554, Machine Learning 554, Power BI 497, Excel 401, NLP 375, AWS 345, Generative AI 334, Deep Learning 294, Tableau 281</canvas>
+      </div>
+    </div>
+    <div style="background:#1c2029; border-radius:10px; padding:14px 16px;">
+      <div style="font-size:13px; color:#8b95a1; margin-bottom:6px;">AI/ML vs data analytics skills</div>
+      <div style="position:relative; height:220px;">
+        <canvas id="donutChart" role="img" aria-label="Donut chart: Data and analytics skills 2675 mentions, AI/ML skills 1557 mentions">Data and analytics skills 2675, AI/ML skills 1557</canvas>
+      </div>
+      <div style="display:flex; justify-content:center; gap:16px; margin-top:8px; font-size:12px; color:#8b95a1;">
+        <span><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#2dd4bf; margin-right:5px;"></span>Data and analytics</span>
+        <span><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#0e9488; margin-right:5px;"></span>AI/ML</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+    <div style="background:#1c2029; border-radius:10px; padding:14px 16px;">
+      <div style="font-size:13px; color:#8b95a1; margin-bottom:6px;">Jobs by experience level</div>
+      <div style="position:relative; height:220px;">
+        <canvas id="expChart" role="img" aria-label="Bar chart of jobs by experience level: Entry 245, Mid 248, Senior 256, Lead 233">Entry 245, Mid 248, Senior 256, Lead 233</canvas>
+      </div>
+    </div>
+    <div style="background:#1c2029; border-radius:10px; padding:14px 16px;">
+      <div style="font-size:13px; color:#8b95a1; margin-bottom:6px;">Top skills by location</div>
+      <div style="position:relative; height:220px;">
+        <canvas id="locChart" role="img" aria-label="Bar chart of jobs by location: New York 115, Chennai 104, Delhi NCR 100, Mumbai 100, London 97, Pune 94, Bengaluru 91, Hyderabad 91, Remote 89, Singapore 88">New York 115, Chennai 104, Delhi NCR 100, Mumbai 100, London 97</canvas>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+Chart.defaults.color = '#8b95a1';
+Chart.defaults.font.family = 'inherit';
+
+new Chart(document.getElementById('skillsChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Python','SQL','Machine learning','Power BI','Excel','NLP','AWS','Generative AI','Deep learning','Tableau'],
+    datasets: [{ data: [597,554,554,497,401,375,345,334,294,281], backgroundColor: '#2dd4bf', borderRadius: 4, barThickness: 16 }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: '#2a2f3a' }, ticks: { color: '#8b95a1' } },
+      y: { grid: { display: false }, ticks: { color: '#f1f5f4' } }
+    }
+  }
+});
+
+new Chart(document.getElementById('donutChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Data and analytics', 'AI/ML'],
+    datasets: [{ data: [2675, 1557], backgroundColor: ['#2dd4bf','#0e9488'], borderColor: '#1c2029', borderWidth: 2 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+});
+
+new Chart(document.getElementById('expChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Entry','Mid','Senior','Lead'],
+    datasets: [{ data: [245,248,256,233], backgroundColor: '#2dd4bf', borderRadius: 4, barThickness: 28 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#f1f5f4' } },
+      y: { grid: { color: '#2a2f3a' }, ticks: { color: '#8b95a1' } }
+    }
+  }
+});
+
+new Chart(document.getElementById('locChart'), {
+  type: 'bar',
+  data: {
+    labels: ['New York','Chennai','Delhi NCR','Mumbai','London','Pune','Bengaluru','Hyderabad','Remote','Singapore'],
+    datasets: [{ data: [115,104,100,100,97,94,91,91,89,88], backgroundColor: '#0e9488', borderRadius: 4, barThickness: 12 }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: '#2a2f3a' }, ticks: { color: '#8b95a1' } },
+      y: { grid: { display: false }, ticks: { color: '#f1f5f4', font: { size: 10 } } }
+    }
+  }
+});
+</script>
